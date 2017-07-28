@@ -22,11 +22,11 @@ public class Camera {
 	}
 	
 	public void translate(Vector3f translation) {
-		Vector3f.add(this.position, translation, this.position);
+		this.position.add(translation);
 	}
 	
 	public void rotate(Vector3f rotation) {
-		Vector3f.add(this.position, rotation, this.position);
+		this.rotation.add(rotation);
 	}
 	
 	public void setPosition(Vector3f position) {

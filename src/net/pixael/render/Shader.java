@@ -116,8 +116,7 @@ public abstract class Shader {
 		GL20.glShaderSource(id, source);
 		GL20.glCompileShader(id);
 		if ((GL20.glGetShaderi(id, GL20.GL_COMPILE_STATUS)) == GL11.GL_FALSE) {
-			System.out.println("Error in shader " + name);
-			System.out.println(GL20.glGetShaderInfoLog(id, 500));
+			throw new GLSLSyntaxException(name, GL20.glGetShaderInfoLog(id, 500));
 		}
 		return id;
 	}

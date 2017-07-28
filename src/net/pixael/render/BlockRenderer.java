@@ -14,6 +14,7 @@ import net.pixael.util.OBJFileReader;
 import net.pixael.util.ResourcesUtil;
 import net.pixael.util.math.MatrixUtil;
 import net.pixael.util.math.Transformation;
+import net.pixael.world.Camera;
 
 public class BlockRenderer {
 	
@@ -30,6 +31,7 @@ public class BlockRenderer {
 		GLStateManager.DEPTH_TEST.enable();
 		GLStateManager.BLEND_TEST.disable();
 		this.shader.enable();
+		this.shader.loadViewMatrix(pixael.getPlayer().getView());
 		this.shader.loadProjectionMatrix(pixael.getOptions().getProjectionMatrix());
 		rotation += 0.005f;
 		Transformation trans = new Transformation(new Vector3f(0, 0, -7), new Vector3f(0, rotation, 0));
@@ -59,7 +61,8 @@ public class BlockRenderer {
 	private static class BlockShader extends Shader {
 		
 		private int loc_transMat,
-					loc_projMat;
+					loc_projMat,
+					loc_viewMat;
 		
 		private BlockShader() {
 			super("blockVertexShader", "blockFragmentShader");
@@ -68,12 +71,13 @@ public class BlockRenderer {
 		protected void bindAttributes() {
 			super.bindAttribute(0, "vertex");
 			super.bindAttribute(1, "texCoords");
-			super.bindAttribute(3, "normal");
+			super.bindAttribute(2, "normal");
 		}
 		
 		protected void getAllUniformsLocation() {
 			this.loc_transMat = super.getUniformLocation("transMat");
 			this.loc_projMat = super.getUniformLocation("projMat");
+			this.loc_viewMat = super.getUniformLocation("viewMat");
 		}
 		
 		private void loadTransformationMatrix(Transformation trans) {
@@ -83,6 +87,11 @@ public class BlockRenderer {
 		
 		private void loadProjectionMatrix(Matrix4f matrix) {
 			super.loadMatrix4(this.loc_projMat, matrix);
+		}
+		
+		private void loadViewMatrix(Camera cam) {
+			Matrix4f viewMat = MatrixUtil.createViewMatrix(cam);
+			super.loadMatrix4(this.loc_viewMat, viewMat);
 		}
 	}
 }

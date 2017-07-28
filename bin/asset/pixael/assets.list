@@ -1,0 +1,30 @@
+{
+	textures:[
+		{
+			name:"splash_screen",
+			resource:"textures\\splashscreen.png",
+			smooth:true
+		},
+		{
+			name:"title_screen_pixael_logo",
+			resource:"textures\\pixaeltitle.png",
+			smooth:true
+		},
+		{
+			name:"title_screen_back",
+			resource:"textures\\pixaeltitleback.png",
+			smooth:true
+		},
+		{
+			name:"title_screen_button_start",
+			resource:"textures\\pixaeltitlestartbutton.png"
+		},
+		{
+			name:"title_screen_button_start_hover",
+			resource:"textures\\pixaeltitlestarthoverbutton.png"
+		},{
+			name:"world_sky_star_map",
+			resource:"textures\\starmap.png"
+		}
+	]
+}

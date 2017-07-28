@@ -18,6 +18,8 @@ import net.fantasticfantasy.mainkit.AbstractUtil;
 import net.fantasticfantasy.mainkit.BuffersTool;
 import net.fantasticfantasy.mainkit.ConsoleManager;
 import net.fantasticfantasy.mainkit.Logger;
+import net.fantasticfantasy.mainkit.maths.Vector2f;
+import net.fantasticfantasy.mainkit.maths.Vector3f;
 import net.pixael.client.Crash;
 import net.pixael.client.GLStateManager;
 import net.pixael.client.Options;
@@ -27,18 +29,19 @@ import net.pixael.client.gui.GUIElement;
 import net.pixael.client.gui.GUIScreen;
 import net.pixael.client.gui.TitleScreen;
 import net.pixael.client.init.PixaelConfiguration;
+import net.pixael.entity.Player;
 import net.pixael.init.Assets;
 import net.pixael.init.UserSettings;
 import net.pixael.render.BlockRenderer;
 import net.pixael.render.GUIRenderer;
+import net.pixael.render.SkyRenderer;
 import net.pixael.render.data.GLDataManager;
 import net.pixael.util.ResourcesUtil;
+import net.pixael.world.World;
 
 public class Pixael {
 	
 	private static Pixael staticPixael;
-	
-	private Thread tickingThread;
 	
 	private long window;
 	private int width, height;
@@ -47,11 +50,19 @@ public class Pixael {
 	private Settings settings;
 	private Options options;
 	private Logger logger;
+
+	private Thread tickingThread;
 	
 	private GUIRenderer guiRenderer;
 	private GUIElement splashscreen;
 	private List<GUIScreen> screens;
 	private int currentScreen;
+	
+	private World world;
+	private Player player;
+	private boolean worldFocus = true;
+	private float[] lastMouseLoc;
+	private SkyRenderer skyRenderer;
 	
 	//Temporary
 	private BlockRenderer br;
@@ -65,12 +76,13 @@ public class Pixael {
 		staticPixael = this;
 		this.width = conf.width;
 		this.height = conf.height;
-		Thread.currentThread().setName("Pixael Main Client");
-		this.logger = new Logger();
+		this.player = new Player(conf.username);
 	}
 	
 	public void start() {
 		try {
+			Thread.currentThread().setName("Pixael Main Client");
+			this.logger = new Logger();
 			if (GLFW.glfwInit()) {
 				this.logger.info("Initialized GLFW!");
 			} else {
@@ -91,20 +103,22 @@ public class Pixael {
 			GLFW.glfwSetMouseButtonCallback(this.window, Mouse.getInstance());
 			GLFW.glfwMakeContextCurrent(this.window);
 			GL.createCapabilities();
+			this.lastMouseLoc = this.getMousePointerLocation();
 			if (ResourcesUtil.makeUnexistingFilesAndDirectories()) {
 				this.logger.info("Created missing files and directories");
 			}
 			GLDataManager.init();
 			GLStateManager.setToDefaultGLConfiguration();
 			Assets.init();
+			this.setWindowIcons();
 			this.guiRenderer = new GUIRenderer();
 			this.splashscreen = new GUIElement(Textures.get("pixael:splash_screen"), 0, 0, this.width, this.height);
+			this.showSplashScreen();
 			this.screens = new ArrayList<>();
 			this.screens.add(new TitleScreen());
 			this.br = new BlockRenderer();
-			this.setWindowIcons();
+			this.skyRenderer = new SkyRenderer();
 			GL11.glClearColor(0f, 1f, 1f, 1f);
-			this.showSplashScreen();
 			this.running = true;
 			this.startTickingThread();
 			//Thread.sleep(3000);
@@ -116,6 +130,7 @@ public class Pixael {
 	
 	private void run() {
 		try {
+			GLFW.glfwSetCursorPos(this.window, this.width / 2, this.height / 2);
 			while (this.running) {
 				this.loop();
 			}
@@ -131,6 +146,10 @@ public class Pixael {
 		}
 		this.clear();
 		this.resizeWindow();
+		if (this.worldFocus) {
+			this.grabMouseCursor();
+		}
+		this.skyRenderer.render();
 		this.br.render();
 		this.screens.get(this.currentScreen).process(this.guiRenderer);
 		//this.guiRenderer.render();
@@ -192,6 +211,20 @@ public class Pixael {
 		} catch (Exception e) {
 			this.handleException(e);
 		}
+	}
+	
+	private void grabMouseCursor() {
+		int xcenter = this.width / 2;
+		int ycenter = this.height / 2;
+		float[] mouseLoc = this.getMousePointerLocation();
+		float xmove = mouseLoc[0] - xcenter;
+		float ymove = mouseLoc[1] - ycenter;
+		float sensivity = 4f / this.settings.getf("mouse_sensivity");
+		float playerXRot = (float) xmove / sensivity;
+		float playerYRot = (float) ymove / sensivity;
+		Vector2f mouseMove = new Vector2f(playerYRot, playerXRot);
+		this.player.getView().getRotation().add(mouseMove.toVector3f());
+		GLFW.glfwSetCursorPos(this.window, xcenter, ycenter);
 	}
 	
 	private void startTickingThread() throws Exception {
@@ -295,6 +328,10 @@ public class Pixael {
 	
 	public Options getOptions() {
 		return this.options;
+	}
+	
+	public Player getPlayer() {
+		return this.player;
 	}
 	
 	public static String getVersion() {

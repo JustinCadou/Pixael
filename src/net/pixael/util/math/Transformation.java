@@ -60,19 +60,17 @@ public class Transformation {
 	}
 	
 	public Transformation translate(Vector3f translation) {
-		Vector3f.add(this.translation, translation, this.translation);
+		this.translation.add(translation);
 		return this;
 	}
 	
 	public Transformation rotate(Vector3f rotation) {
-		Vector3f.add(this.rotation, rotation, this.rotation);
+		this.rotation.add(rotation);
 		return this;
 	}
 	
 	public Transformation scale(Vector3f scale) {
-		this.scale.x *= scale.x;
-		this.scale.y *= scale.y;
-		this.scale.z *= scale.z;
+		this.scale.mul(scale);
 		return this;
 	}
 	
