@@ -23,6 +23,9 @@
 			name:"title_screen_button_start_hover",
 			resource:"textures\\pixaeltitlestarthoverbutton.png"
 		},{
+			name:"world_cursor",
+			resource:"textures\\cursor.png"
+		},{
 			name:"world_sky_star_map",
 			resource:"textures\\starmap.png"
 		}

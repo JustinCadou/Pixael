@@ -17,9 +17,9 @@ public class MatrixUtil {
 		Matrix4f.setIdentity(matrix);
 		Matrix4f.translate(transformation.getTranslation(), matrix, matrix);
 		Vector3f rot = transformation.getRotation();
-		Matrix4f.rotate(rot.x, new Vector3f(1, 0, 0), matrix, matrix);
-		Matrix4f.rotate(rot.y, new Vector3f(0, 1, 0), matrix, matrix);
-		Matrix4f.rotate(rot.z, new Vector3f(0, 0, 1), matrix, matrix);
+		Matrix4f.rotate((float) Math.toRadians(rot.x), new Vector3f(1, 0, 0), matrix, matrix);
+		Matrix4f.rotate((float) Math.toRadians(rot.y), new Vector3f(0, 1, 0), matrix, matrix);
+		Matrix4f.rotate((float) Math.toRadians(rot.z), new Vector3f(0, 0, 1), matrix, matrix);
 		Matrix4f.scale(transformation.getScale(), matrix, matrix);
 		return matrix;
 	}

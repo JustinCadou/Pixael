@@ -35,26 +35,32 @@ public class Transformation {
 	}
 	
 	public Transformation move(Vector3f translation, int rotationAxis) {
-		boolean rotxax = (X & rotationAxis) == X;
+//		boolean rotxax = (X & rotationAxis) == X;
 		boolean rotyax = (Y & rotationAxis) == Y;
-		boolean rotzax = (Z & rotationAxis) == Z;
+//		boolean rotzax = (Z & rotationAxis) == Z;
 		float cosYZ = (float) Math.cos(Math.toRadians(this.rotation.y));
 		float sinYZ = (float) Math.sin(Math.toRadians(this.rotation.y));
 		float cosYX = (float) Math.cos(Math.toRadians(this.rotation.y - 90));
 		float sinYX = (float) Math.sin(Math.toRadians(this.rotation.y - 90));
-		float cosXY = (float) Math.cos(Math.toRadians(this.rotation.x));
-		float sinXY = (float) Math.sin(Math.toRadians(this.rotation.x));
-		float cosXZ = (float) Math.cos(Math.toRadians(this.rotation.x - 90));
-		float sinXZ = (float) Math.sin(Math.toRadians(this.rotation.x - 90));
-		float cosZX = (float) Math.cos(Math.toRadians(this.rotation.z));
-		float sinZX = (float) Math.sin(Math.toRadians(this.rotation.z));
-		float cosZY = (float) Math.cos(Math.toRadians(this.rotation.z - 90));
-		float sinZY = (float) Math.sin(Math.toRadians(this.rotation.z - 90));
-		float dx = 0, dy = 0, dz = 0;
-		if (rotxax) { //Fine, later...
-			dx = translation.x;
-			dy = translation.y * (cosXY);
-			dz = translation.z * (cosXZ);
+//		float cosXY = (float) Math.cos(Math.toRadians(this.rotation.x));
+//		float sinXY = (float) Math.sin(Math.toRadians(this.rotation.x));
+//		float cosXZ = (float) Math.cos(Math.toRadians(this.rotation.x - 90));
+//		float sinXZ = (float) Math.sin(Math.toRadians(this.rotation.x - 90));
+//		float cosZX = (float) Math.cos(Math.toRadians(this.rotation.z));
+//		float sinZX = (float) Math.sin(Math.toRadians(this.rotation.z));
+//		float cosZY = (float) Math.cos(Math.toRadians(this.rotation.z - 90));
+//		float sinZY = (float) Math.sin(Math.toRadians(this.rotation.z - 90));
+		Vector3f trans;
+		if (rotyax) {
+			trans = new Vector3f();
+			trans.x = translation.z * -sinYZ;
+			trans.z = translation.z * cosYZ;
+			this.translate(trans);
+			trans = new Vector3f();
+			trans.x = translation.x * sinYX;
+			trans.z = translation.x * -cosYX;
+			this.translate(trans);
+			this.translate(new Vector3f(0, translation.y, 0));
 		}
 		return this;
 	}

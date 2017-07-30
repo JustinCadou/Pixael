@@ -60,8 +60,8 @@ public class Pixael {
 	
 	private World world;
 	private Player player;
-	private boolean worldFocus = true;
-	private float[] lastMouseLoc;
+	private GUIElement cursor;
+	private boolean worldFocus;
 	private SkyRenderer skyRenderer;
 	
 	//Temporary
@@ -103,7 +103,6 @@ public class Pixael {
 			GLFW.glfwSetMouseButtonCallback(this.window, Mouse.getInstance());
 			GLFW.glfwMakeContextCurrent(this.window);
 			GL.createCapabilities();
-			this.lastMouseLoc = this.getMousePointerLocation();
 			if (ResourcesUtil.makeUnexistingFilesAndDirectories()) {
 				this.logger.info("Created missing files and directories");
 			}
@@ -114,11 +113,12 @@ public class Pixael {
 			this.guiRenderer = new GUIRenderer();
 			this.splashscreen = new GUIElement(Textures.get("pixael:splash_screen"), 0, 0, this.width, this.height);
 			this.showSplashScreen();
+			this.cursor = new GUIElement(Textures.get("pixael:world_cursor"), this.width / 2 - 7, this.height / 2 - 7, 14, 14);
 			this.screens = new ArrayList<>();
 			this.screens.add(new TitleScreen());
 			this.br = new BlockRenderer();
 			this.skyRenderer = new SkyRenderer();
-			GL11.glClearColor(0f, 1f, 1f, 1f);
+			GL11.glClearColor(0f, 0.05f, 0.1f, 1f);
 			this.running = true;
 			this.startTickingThread();
 			//Thread.sleep(3000);
@@ -148,23 +148,37 @@ public class Pixael {
 		this.resizeWindow();
 		if (this.worldFocus) {
 			this.grabMouseCursor();
+			this.skyRenderer.render();
+			this.br.render();
+			this.guiRenderer.processElement(this.cursor);
+			this.guiRenderer.render();
 		}
-		this.skyRenderer.render();
-		this.br.render();
-		this.screens.get(this.currentScreen).process(this.guiRenderer);
-		//this.guiRenderer.render();
+		this.drawCurrentScreen();
 		GLFW.glfwPollEvents();
 		this.handleKeyEvents();
 		GLFW.glfwSwapBuffers(this.window);
 	}
 	
 	private void tick() throws Exception {
-		this.screens.get(this.currentScreen).tick();
+		this.updateCurrentScreen();
 	}
 	
 	private void handleKeyEvents() {
 		if (Keyboard.isKeyDown(GLFW.GLFW_KEY_SPACE)) {
-			System.out.println("Space");
+			this.requestWorldFocus(true);
+		} else if (Keyboard.isKeyDown(GLFW.GLFW_KEY_ESCAPE)) {
+			this.requestWorldFocus(false);
+		}
+		if (this.worldFocus) {
+			if (Keyboard.isKeyDown(GLFW.GLFW_KEY_W)) {
+				this.player.move(new Vector3f(0, 0, 0.1f));
+			} if (Keyboard.isKeyDown(GLFW.GLFW_KEY_S)) {
+				this.player.move(new Vector3f(0, 0, -0.1f));
+			} if (Keyboard.isKeyDown(GLFW.GLFW_KEY_D)) {
+				this.player.move(new Vector3f(0.1f, 0, 0));
+			} if (Keyboard.isKeyDown(GLFW.GLFW_KEY_A)) {
+				this.player.move(new Vector3f(-0.1f, 0, 0));
+			}
 		}
 		if (Mouse.isButtonDown(GLFW.GLFW_MOUSE_BUTTON_RIGHT)) {
 			System.out.println("Right");
@@ -180,6 +194,7 @@ public class Pixael {
 			this.width = w[0];
 			this.height = h[0];
 			this.splashscreen.setDimension(w[0], h[0]);
+			this.cursor.setLocation(w[0] / 2 - 7, h[0] / 2 - 7);
 		}
 	}
 	
@@ -219,11 +234,11 @@ public class Pixael {
 		float[] mouseLoc = this.getMousePointerLocation();
 		float xmove = mouseLoc[0] - xcenter;
 		float ymove = mouseLoc[1] - ycenter;
-		float sensivity = 4f / this.settings.getf("mouse_sensivity");
+		float sensivity = 6f / this.settings.getf("mouse_sensivity");
 		float playerXRot = (float) xmove / sensivity;
 		float playerYRot = (float) ymove / sensivity;
 		Vector2f mouseMove = new Vector2f(playerYRot, playerXRot);
-		this.player.getView().getRotation().add(mouseMove.toVector3f());
+		this.player.rotate(mouseMove.toVector3f());
 		GLFW.glfwSetCursorPos(this.window, xcenter, ycenter);
 	}
 	
@@ -254,8 +269,7 @@ public class Pixael {
 						} else {
 							timeOverflow += -wait;
 							if (timeOverflow > 75) {
-								logger.warn("Ticking is taking way to much time! (Having now "
-										+ timeOverflow + " overflowing millis!)");
+								logger.warn("Ticking is taking way to much time! (Having now " + timeOverflow + " overflowing millis!)");
 								overflowStatus = true;
 							}
 						}
@@ -266,6 +280,21 @@ public class Pixael {
 			}
 		}, "Pixael Ticking Thread");
 		this.tickingThread.start();
+	}
+	
+	private void drawCurrentScreen() {
+		if (this.currentScreen == -1) {
+			return;
+		}
+		this.screens.get(this.currentScreen).process(this.guiRenderer);
+		this.guiRenderer.render();
+	}
+	
+	private void updateCurrentScreen() {
+		if (this.currentScreen == -1) {
+			return;
+		}
+		this.screens.get(this.currentScreen).tick();
 	}
 	
 	private void setWindowIcons() throws IOException {
@@ -313,6 +342,18 @@ public class Pixael {
 	
 	private void clear() {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_ACCUM_BUFFER_BIT);
+	}
+	
+	public void requestWorldFocus(boolean focus) {
+		this.worldFocus = focus;
+		if (focus) {
+			GLFW.glfwSetInputMode(this.window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+			GLFW.glfwSetCursorPos(this.window, this.width / 2, this.height / 2);
+			this.currentScreen = -1;
+		} else {
+			GLFW.glfwSetInputMode(this.window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+			this.currentScreen = 0;
+		}
 	}
 	
 	public int[] getWindowSize() {
