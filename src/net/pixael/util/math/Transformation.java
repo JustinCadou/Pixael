@@ -60,7 +60,7 @@ public class Transformation {
 			trans.x = translation.x * sinYX;
 			trans.z = translation.x * -cosYX;
 			this.translate(trans);
-			this.translate(new Vector3f(0, translation.y, 0));
+			this.translate(new Vector3f(0, -translation.y, 0));
 		}
 		return this;
 	}

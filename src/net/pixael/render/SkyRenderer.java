@@ -70,6 +70,11 @@ public class SkyRenderer {
 		this.starShader.disable();
 	}
 	
+	public void cleanUp() {
+		this.skyShader.destroy();
+		this.starShader.destroy();
+	}
+	
 	private static class SkyColorShader extends Shader {
 		
 		private int loc_transMat;

@@ -34,7 +34,9 @@ import net.pixael.init.Assets;
 import net.pixael.init.UserSettings;
 import net.pixael.render.BlockRenderer;
 import net.pixael.render.GUIRenderer;
+import net.pixael.render.GUIShapeDrawer;
 import net.pixael.render.SkyRenderer;
+import net.pixael.render.data.Color;
 import net.pixael.render.data.GLDataManager;
 import net.pixael.util.ResourcesUtil;
 import net.pixael.world.World;
@@ -54,6 +56,7 @@ public class Pixael {
 	private Thread tickingThread;
 	
 	private GUIRenderer guiRenderer;
+	private GUIShapeDrawer guiDrawer;
 	private GUIElement splashscreen;
 	private List<GUIScreen> screens;
 	private int currentScreen;
@@ -113,12 +116,13 @@ public class Pixael {
 			this.guiRenderer = new GUIRenderer();
 			this.splashscreen = new GUIElement(Textures.get("pixael:splash_screen"), 0, 0, this.width, this.height);
 			this.showSplashScreen();
+			this.guiDrawer = new GUIShapeDrawer();
 			this.cursor = new GUIElement(Textures.get("pixael:world_cursor"), this.width / 2 - 7, this.height / 2 - 7, 14, 14);
 			this.screens = new ArrayList<>();
 			this.screens.add(new TitleScreen());
 			this.br = new BlockRenderer();
 			this.skyRenderer = new SkyRenderer();
-			GL11.glClearColor(0f, 0.05f, 0.1f, 1f);
+			GLStateManager.setClearColor(Color.AQUA);
 			this.running = true;
 			this.startTickingThread();
 			//Thread.sleep(3000);
@@ -178,6 +182,10 @@ public class Pixael {
 				this.player.move(new Vector3f(0.1f, 0, 0));
 			} if (Keyboard.isKeyDown(GLFW.GLFW_KEY_A)) {
 				this.player.move(new Vector3f(-0.1f, 0, 0));
+			} if (Keyboard.isKeyDown(GLFW.GLFW_KEY_SPACE)) {
+				this.player.move(new Vector3f(0, 0.1f, 0));
+			} if (Keyboard.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)) {
+				this.player.move(new Vector3f(0, -0.1f, 0));
 			}
 		}
 		if (Mouse.isButtonDown(GLFW.GLFW_MOUSE_BUTTON_RIGHT)) {
@@ -215,6 +223,7 @@ public class Pixael {
 			UserSettings.save(this.settings);
 			Textures.unloadAll();
 			this.guiRenderer.cleanUp();
+			this.skyRenderer.cleanUp();
 			GLDataManager.close();
 			this.tickingThread.join();
 			GLFW.glfwDestroyWindow(this.window);
@@ -345,6 +354,9 @@ public class Pixael {
 	}
 	
 	public void requestWorldFocus(boolean focus) {
+		if (this.worldFocus == focus) {
+			return;
+		}
 		this.worldFocus = focus;
 		if (focus) {
 			GLFW.glfwSetInputMode(this.window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
@@ -369,6 +381,10 @@ public class Pixael {
 	
 	public Options getOptions() {
 		return this.options;
+	}
+	
+	public GUIShapeDrawer getGUIDrawer() {
+		return this.guiDrawer;
 	}
 	
 	public Player getPlayer() {

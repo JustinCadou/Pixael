@@ -42,7 +42,7 @@ public class Main {
 	private static String playerName() {
 		int one = (int) System.nanoTime() % 0xFFFF;
 		String two = Integer.toHexString(one);
-		String three = two.substring(two.length() - (3 < two.length() ? two.length() : 3), two.length());
+		String three = two.substring(two.length() - (3 > two.length() ? 3 : two.length()), two.length());
 		return "Player" + three.toUpperCase();
 	}
 	

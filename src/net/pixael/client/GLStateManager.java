@@ -1,12 +1,17 @@
 package net.pixael.client;
 
 import org.lwjgl.opengl.GL11;
+import net.pixael.render.data.Color;
 
 public class GLStateManager {
 	
 	public static final State CULL_FACE = new State(GL11.GL_CULL_FACE);
 	public static final State DEPTH_TEST = new State(GL11.GL_DEPTH_TEST);
 	public static final State BLEND_TEST = new State(GL11.GL_BLEND);
+	
+	public static void setClearColor(Color color) {
+		GL11.glClearColor(color.r, color.g, color.b, color.a);
+	}
 	
 	public static void setToDefaultGLConfiguration() {
 		cullFaceMode(CullFace.BACK);
