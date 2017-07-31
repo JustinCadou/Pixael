@@ -122,7 +122,7 @@ public class Pixael {
 			this.screens.add(new TitleScreen());
 			this.br = new BlockRenderer();
 			this.skyRenderer = new SkyRenderer();
-			GLStateManager.setClearColor(Color.AQUA);
+			GLStateManager.setClearColor(Color.CYAN);
 			this.running = true;
 			this.startTickingThread();
 			//Thread.sleep(3000);
@@ -392,7 +392,7 @@ public class Pixael {
 	}
 	
 	public static String getVersion() {
-		return "Medieval Build 2.7";
+		return "pre-alpha 0.0.0.1";
 	}
 	
 	public static Pixael getPixael() {

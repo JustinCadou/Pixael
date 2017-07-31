@@ -10,7 +10,7 @@ public class GLStateManager {
 	public static final State BLEND_TEST = new State(GL11.GL_BLEND);
 	
 	public static void setClearColor(Color color) {
-		GL11.glClearColor(color.r, color.g, color.b, color.a);
+		GL11.glClearColor(color.getR(), color.getG(), color.getB(), color.getA());
 	}
 	
 	public static void setToDefaultGLConfiguration() {

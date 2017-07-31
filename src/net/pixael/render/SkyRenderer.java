@@ -47,7 +47,7 @@ public class SkyRenderer {
 		this.skyShader.loadTransformationMatrix(this.skyTrans);
 		this.skyShader.loadRotationMatrix(pixael.getPlayer().getView());
 		this.skyShader.loadProjectionMatrix(projMat);
-		GL30.glBindVertexArray(this.box.getID());
+		GL30.glBindVertexArray(this.box.getId());
 		GL20.glEnableVertexAttribArray(0);
 		GL11.glDrawElements(GL11.GL_TRIANGLES, this.box.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 		GL20.glDisableVertexAttribArray(0);
@@ -58,11 +58,11 @@ public class SkyRenderer {
 		this.starShader.loadTransformationMatrix(this.starsTrans);
 		this.starShader.loadRotationMatrix(pixael.getPlayer().getView());
 		this.starShader.loadProjectionMatrix(projMat);
-		GL30.glBindVertexArray(model.getID());
+		GL30.glBindVertexArray(model.getId());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, Textures.get("pixael:world_sky_star_map").id());
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, Textures.get("pixael:world_sky_star_map").getId());
 		GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 		GL20.glDisableVertexAttribArray(0);
 		GL20.glDisableVertexAttribArray(1);

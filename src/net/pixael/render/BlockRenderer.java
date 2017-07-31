@@ -9,6 +9,7 @@ import net.fantasticfantasy.mainkit.maths.Matrix4f;
 import net.fantasticfantasy.mainkit.maths.Vector3f;
 import net.pixael.Pixael;
 import net.pixael.client.GLStateManager;
+import net.pixael.render.data.Light;
 import net.pixael.render.data.RawModel;
 import net.pixael.util.OBJFileReader;
 import net.pixael.util.ResourcesUtil;
@@ -33,10 +34,10 @@ public class BlockRenderer {
 		this.shader.enable();
 		this.shader.loadViewMatrix(pixael.getPlayer().getView());
 		this.shader.loadProjectionMatrix(pixael.getOptions().getProjectionMatrix());
-		rotation += 0.005f;
+		rotation += 0.5f;
 		Transformation trans = new Transformation(new Vector3f(0, 0, -7), new Vector3f(0, rotation, 0));
 		this.shader.loadTransformationMatrix(trans);
-		GL30.glBindVertexArray(_temp_vao.getID());
+		GL30.glBindVertexArray(_temp_vao.getId());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
@@ -62,7 +63,11 @@ public class BlockRenderer {
 		
 		private int loc_transMat,
 					loc_projMat,
-					loc_viewMat;
+					loc_viewMat,
+					loc_sunPos,
+					loc_moonPos,
+					loc_sunColor,
+					loc_moonColor;
 		
 		private BlockShader() {
 			super("blockVertexShader", "blockFragmentShader");
@@ -78,6 +83,10 @@ public class BlockRenderer {
 			this.loc_transMat = super.getUniformLocation("transMat");
 			this.loc_projMat = super.getUniformLocation("projMat");
 			this.loc_viewMat = super.getUniformLocation("viewMat");
+			this.loc_sunPos = super.getUniformLocation("sunPos");
+			this.loc_moonPos = super.getUniformLocation("moonPos");
+			this.loc_sunColor = super.getUniformLocation("sunColor");
+			this.loc_moonColor = super.getUniformLocation("moonColor");
 		}
 		
 		private void loadTransformationMatrix(Transformation trans) {
@@ -92,6 +101,16 @@ public class BlockRenderer {
 		private void loadViewMatrix(Camera cam) {
 			Matrix4f viewMat = MatrixUtil.createViewMatrix(cam);
 			super.loadMatrix4(this.loc_viewMat, viewMat);
+		}
+		
+		private void loadSun(Light sun) {
+			super.loadVector3(this.loc_sunPos, sun.getPosition());
+			super.loadVector3(this.loc_sunColor, sun.getColor3f());
+		}
+		
+		private void loadMoon(Light moon) {
+			super.loadVector3(this.loc_moonPos, moon.getPosition());
+			super.loadVector3(this.loc_moonColor, moon.getColor3f());
 		}
 	}
 }

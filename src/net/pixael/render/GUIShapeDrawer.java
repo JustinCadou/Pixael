@@ -40,7 +40,7 @@ public class GUIShapeDrawer {
 		GLStateManager.BLEND_TEST.enable();
 		this.shader.enable();
 		this.shader.loadColor(this.color);
-		GL30.glBindVertexArray(this.model.getID());
+		GL30.glBindVertexArray(this.model.getId());
 		GL20.glEnableVertexAttribArray(0);
 		GL11.glDrawElements(GL11.GL_TRIANGLES, this.model.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 		GL20.glDisableVertexAttribArray(0);

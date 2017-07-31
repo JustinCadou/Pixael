@@ -30,13 +30,13 @@ public class GUIRenderer {
 		GLStateManager.DEPTH_TEST.disable();
 		GLStateManager.BLEND_TEST.enable();
 		this.shader.enable();
-		GL30.glBindVertexArray(GUIElement.MODEL.getID());
+		GL30.glBindVertexArray(GUIElement.MODEL.getId());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
 		for (GUIElement element : this.elements) {
 			this.shader.loadTransformation(element.getTransformation());
 			GL13.glActiveTexture(GL13.GL_TEXTURE0);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, element.getImage().id());
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, element.getImage().getId());
 			GL11.glDrawElements(GL11.GL_TRIANGLES, GUIElement.MODEL.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 		}
 		GL20.glDisableVertexAttribArray(0);

@@ -92,7 +92,7 @@ public class GLDataManager {
 			return false;
 		}
 		List<Integer> vbos = models.remove(model);
-		GL30.glDeleteVertexArrays(model.getID());
+		GL30.glDeleteVertexArrays(model.getId());
 		for (int vbo : vbos) {
 			GL15.glDeleteBuffers(vbo);
 		}
@@ -104,7 +104,7 @@ public class GLDataManager {
 		if (!r) {
 			return false;
 		}
-		GL11.glDeleteTextures(texture.id());
+		GL11.glDeleteTextures(texture.getId());
 		textures.remove(texture);
 		return true;
 	}
