@@ -1,7 +1,5 @@
 package net.pixael.render;
 
-import java.io.InputStream;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -10,11 +8,10 @@ import net.fantasticfantasy.mainkit.maths.Matrix4f;
 import net.fantasticfantasy.mainkit.maths.Vector3f;
 import net.pixael.Pixael;
 import net.pixael.client.GLStateManager;
+import net.pixael.client.Models;
 import net.pixael.client.Textures;
 import net.pixael.client.gui.GUIElement;
 import net.pixael.render.data.RawModel;
-import net.pixael.util.OBJFileReader;
-import net.pixael.util.ResourcesUtil;
 import net.pixael.util.math.MatrixUtil;
 import net.pixael.util.math.Transformation;
 import net.pixael.world.Camera;
@@ -32,8 +29,7 @@ public class SkyRenderer {
 		this.skyTrans = new Transformation(new Vector3f(-6, -6, -6), new Vector3f(90, 0, 0), new Vector3f(12, 12, 12));
 		this.starShader = new StarShader();
 		this.starsTrans = new Transformation(new Vector3f(0, 12, 0), new Vector3f(90, 0, 0), new Vector3f(25, 25, 1));
-		InputStream in = ResourcesUtil.createAssetInputStream("full_block.obj");
-		this.box = OBJFileReader.loadOBJFile(in);
+		this.box = Models.get("pixael:full_block");
 	}
 	
 	public void render(int... time) {

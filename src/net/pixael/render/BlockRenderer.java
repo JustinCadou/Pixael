@@ -1,6 +1,5 @@
 package net.pixael.render;
 
-import java.io.InputStream;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -8,11 +7,11 @@ import org.lwjgl.opengl.GL30;
 import net.fantasticfantasy.mainkit.maths.Matrix4f;
 import net.fantasticfantasy.mainkit.maths.Vector3f;
 import net.pixael.Pixael;
+import net.pixael.block.Block;
+import net.pixael.client.Blocks;
 import net.pixael.client.GLStateManager;
+import net.pixael.render.data.Color;
 import net.pixael.render.data.Light;
-import net.pixael.render.data.RawModel;
-import net.pixael.util.OBJFileReader;
-import net.pixael.util.ResourcesUtil;
 import net.pixael.util.math.MatrixUtil;
 import net.pixael.util.math.Transformation;
 import net.pixael.world.Camera;
@@ -23,7 +22,6 @@ public class BlockRenderer {
 	
 	public BlockRenderer() {
 		this.shader = new BlockShader();
-		_temp_();
 	}
 	
 	public void render() {
@@ -34,16 +32,17 @@ public class BlockRenderer {
 		this.shader.enable();
 		this.shader.loadViewMatrix(pixael.getPlayer().getView());
 		this.shader.loadProjectionMatrix(pixael.getOptions().getProjectionMatrix());
-		rotation += 0.5f;
-		Transformation trans = new Transformation(new Vector3f(0, 0, -7), new Vector3f(0, rotation, 0));
+		Transformation trans = new Transformation(new Vector3f(0, 0, -7), new Vector3f(0, 0, 0));
 		this.shader.loadTransformationMatrix(trans);
-		GL30.glBindVertexArray(_temp_vao.getId());
+		this.shader.loadSun(new Light(new Vector3f(50, 100, 0), Color.WHITE));
+		Block block = Blocks.getBlock("pixael:grass");
+		GL30.glBindVertexArray(block.getModel().getId());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 3);
-		GL11.glDrawElements(GL11.GL_TRIANGLES, _temp_vao.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, block.getTexture().getId());
+		GL11.glDrawElements(GL11.GL_TRIANGLES, block.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 		GL20.glDisableVertexAttribArray(0);
 		GL20.glDisableVertexAttribArray(1);
 		GL20.glDisableVertexAttribArray(2);
@@ -51,23 +50,13 @@ public class BlockRenderer {
 		this.shader.disable();
 	}
 	
-	private static RawModel _temp_vao;
-	private static float rotation;
-	
-	private static void _temp_() {
-		InputStream in = ResourcesUtil.createAssetInputStream("full_block.obj");
-		_temp_vao = OBJFileReader.loadOBJFile(in);
-	}
-	
 	private static class BlockShader extends Shader {
 		
 		private int loc_transMat,
 					loc_projMat,
 					loc_viewMat,
-					loc_sunPos,
-					loc_moonPos,
-					loc_sunColor,
-					loc_moonColor;
+					loc_lightPos,
+					loc_lightColor;
 		
 		private BlockShader() {
 			super("blockVertexShader", "blockFragmentShader");
@@ -83,10 +72,8 @@ public class BlockRenderer {
 			this.loc_transMat = super.getUniformLocation("transMat");
 			this.loc_projMat = super.getUniformLocation("projMat");
 			this.loc_viewMat = super.getUniformLocation("viewMat");
-			this.loc_sunPos = super.getUniformLocation("sunPos");
-			this.loc_moonPos = super.getUniformLocation("moonPos");
-			this.loc_sunColor = super.getUniformLocation("sunColor");
-			this.loc_moonColor = super.getUniformLocation("moonColor");
+			this.loc_lightPos = super.getUniformLocation("lightPos");
+			this.loc_lightColor = super.getUniformLocation("lightColor");
 		}
 		
 		private void loadTransformationMatrix(Transformation trans) {
@@ -104,13 +91,8 @@ public class BlockRenderer {
 		}
 		
 		private void loadSun(Light sun) {
-			super.loadVector3(this.loc_sunPos, sun.getPosition());
-			super.loadVector3(this.loc_sunColor, sun.getColor3f());
-		}
-		
-		private void loadMoon(Light moon) {
-			super.loadVector3(this.loc_moonPos, moon.getPosition());
-			super.loadVector3(this.loc_moonColor, moon.getColor3f());
+			super.loadVector3(this.loc_lightPos, sun.getPosition());
+			super.loadVector3(this.loc_lightColor, sun.getColor3f());
 		}
 	}
 }

@@ -29,5 +29,11 @@
 			name:"world_sky_star_map",
 			resource:"textures\\starmap.png"
 		}
+	],
+	models:[
+		{
+			name:"full_block",
+			resource:"models\\full_block.obj"
+		}
 	]
 }

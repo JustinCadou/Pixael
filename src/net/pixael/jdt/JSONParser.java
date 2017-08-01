@@ -312,6 +312,7 @@ public class JSONParser {
 							jdtTag.name = tagname;
 							jdt.addTag(jdtTag);
 							sb = new StringBuilder();
+							i++;
 						}
 					} else if (brkLevel < 0) {
 						throw new JSONSyntaxException("Unbalanced square brakets", raw, i);
